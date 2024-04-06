@@ -20,6 +20,10 @@ npm start
 
 ### 然后添加插件后需要在`public/data/plugins.json`中将 review_status(审核状态) 改为 1,才能显示
 
+### 接口
+
+获取所有插件：xxx/plugins/getPlugins
+
 ### 网站
 
 网页插件库(http://plugins.mzbs.top/)
