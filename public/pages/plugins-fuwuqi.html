@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>插件库展示</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10.15.5/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10.15.5/dist/sweetalert2.all.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: flex-end;
+            padding: 10px;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .plugin {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin: 10px;
+            padding: 20px;
+            width: calc(33.333% - 20px);
+            box-sizing: border-box;
+            background-color: #ffffff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .plugin h3,
+        .plugin p {
+            margin: 10px 0;
+        }
+
+        .plugin a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .plugin a:hover {
+            text-decoration: underline;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #modal {
+            position: fixed;
+            /* Stay in place */
+            z-index: 1;
+            /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%;
+            /* Full width */
+            height: 100%;
+            /* Full height */
+            overflow: auto;
+            /* Enable scroll if needed */
+            background-color: rgb(0, 0, 0);
+            /* Fallback color */
+            background-color: rgba(0, 0, 0, 0.4);
+            /* Black w/ opacity */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #modalContent {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+        }
+
+        .floating-window {
+            position: fixed;
+            top: 10%;
+            right: 10%;
+            width: 300px;
+            padding: 20px;
+            background-color: #ffffff;
+            /* 更亮的背景色 */
+            border: 1px solid #ccc;
+            /* 更细更淡的边框 */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            /* 更柔和的阴影 */
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            border-radius: 8px;
+            /* 圆角 */
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+            /* 动画效果 */
+        }
+
+        .floating-window h2 {
+            font-size: 20px;
+            color: #333;
+        }
+
+        .floating-window p {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .floating-window button {
+            padding: 10px 20px;
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .floating-window button:hover {
+            background-color: #004494;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        input[type="text"]:focus {
+            border-color: #4A90E2;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 添加插件的按钮 -->
+    <div class="top-bar">
+        <button id="addPluginBtn">设置插件</button>
+    </div>
+
+    <!-- 悬浮窗 -->
+    <div id="modal" style="display: none;">
+        <div id="modalContent">
+            <h2>设置插件</h2>
+            <input type="text" id="pluginName" placeholder="插件名称">
+            <input type="text" id="authon" placeholder="作者">
+            <input type="text" id="dowUrl" placeholder="下载地址">
+            <input type="text" id="dos" placeholder="简介">
+            <button id="submitPlugin">完成</button>
+            <button onclick="document.getElementById('modal').style.display='none'">关闭</button>
+        </div>
+    </div>
+
+    <h1>Mz-bot插件库</h1>
+
+    <div class="container" id="pluginContainer">
+        <!-- 插件将在这里动态添加 -->
+    </div>
+
+    <script>
+        // 向服务器发送请求并获取插件信息
+        //http://plugins.mzbs.top/
+        // 向服务器发送请求并获取插件信息
+        fetch('http://plugins.mzbs.top/plugins/getPlugins', {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                const container = document.getElementById('pluginContainer');
+                container.innerHTML = '';
+                data.forEach(plugin => {
+                    if (plugin.review_status === 1) {
+                        const pluginDiv = document.createElement('div');
+                        pluginDiv.className = 'plugin';
+                        pluginDiv.innerHTML = `
+            <h3 data-plugin-id="${plugin.name}">${plugin.name}</h3>
+            <p>作者: ${plugin.authon}</p>
+            <p>下载地址: <a href="${plugin.dowUrl}" target="_blank">下载</a></p>
+            <p>简介: ${plugin.dos}</p>
+            <p class="likes">点赞数: ${plugin.likes}</p>
+            <button class="likeBtn" data-plugin-id="${plugin.name}">点赞</button>
+        `;
+                        container.appendChild(pluginDiv);
+                    }
+                });
+            })
+            .catch(error => console.error('Error:', error));
+
+        document.getElementById('addPluginBtn').onclick = function () {
+            document.getElementById('modal').style.display = 'flex';
+        };
+
+        document.getElementById('submitPlugin').onclick = function () {
+            const pluginName = document.getElementById('pluginName').value;
+            const authon = document.getElementById('authon').value;
+            const dowUrl = document.getElementById('dowUrl').value;
+            const dos = document.getElementById('dos').value;
+
+            fetch('http://plugins.mzbs.top/plugins/setPlugins', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ pluginName, authon, dowUrl, dos }),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    Swal.fire(data.message);
+                    document.getElementById('modal').style.display = 'none'; // 关闭悬浮窗
+                })
+                .catch(error => console.error('Error:', error));
+        };
+        document.getElementById('pluginContainer').addEventListener('click', function (e) {
+            if (e.target.classList.contains('likeBtn')) {
+                const pluginDiv = e.target.closest('.plugin');
+                // const pluginId = pluginDiv.getAttribute('data-plugin-id');
+                const pluginId = e.target.getAttribute('data-plugin-id');
+                fetch('http://plugins.mzbs.top/plugins/likePlugin', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ pluginId }),
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire(data.message, 'success');
+                            pluginDiv.querySelector('.likes').textContent = `点赞数: ${data.newLikes}`;
+                        } else {
+                            Swal.fire(data.message, 'error');
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+        });
+    </script>
+
+</body>
+
+</html>
