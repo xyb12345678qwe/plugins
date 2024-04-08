@@ -18,7 +18,15 @@ npm start
 
 ```
 
-### 然后添加插件后需要在`public/data/plugins.json`中将 review_status(审核状态) 改为 1,才能显示
+### 审核插件
+
+然后添加插件后需要在`public/data/plugins.json`中将 review_status(审核状态) 改为 1,才能显示
+
+或者可以访问 `xxx/admin`
+
+默认密码 12345678,账号 root
+
+`public/data/admin.json`里可以更改密码,账号
 
 ### 接口
 
