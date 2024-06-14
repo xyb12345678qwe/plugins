@@ -10,11 +10,10 @@
 
 ```sh
 
-git clone https://gitee.com/xyb12345678qwe/plugins.git
-
-npm i
-
-npm start
+git clone https://gitee.com/xyb12345678qwe/plugins.git    
+cd plugins    
+npm i    
+npm start    
 
 ```
 
